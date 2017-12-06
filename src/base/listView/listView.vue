@@ -4,7 +4,7 @@
           <li v-for="(group,index) in data" :key="index" class="list-group" ref="listgroup">
               <h2 class="list-group-title">{{ group.title }}</h2>
               <ul>
-                  <li v-for="(item,item_index) in group.items" :key="item_index" class="list-group-item">
+                  <li v-for="(item,item_index) in group.items" :key="item_index" class="list-group-item" @click="selectItem(item)">
                       <img v-lazy="item.avatar" alt="avatar" class="avatar">
                       <span class="name">{{ item.name }}</span>
                   </li>
@@ -18,14 +18,22 @@
               </li>
           </ul>
       </div>
+      <div class="list-fixed" v-show="fixedTitle" ref="fixed">
+          <h1 class="fixed-title">{{ fixedTitle }}</h1>
+      </div>
+      <div class="loading-container" v-show="!data.length">
+          <loading></loading>
+      </div>
   </scorll>
 </template>
 
 <script>
 import scorll from '../scroll/scroll'
+import loading from '../loading/loading'
 import { getData } from '../../common/js/dom'
 
 const ANCHOR_HEIGHT = 18
+const TITLE_HEIGHT = 29
 
 export default {
     props: {
@@ -35,12 +43,14 @@ export default {
         }
     },
     components: {
-        scorll
+        scorll,
+        loading
     },
     data() {
         return {
             scrollY: -1,
-            currentIndex: 0
+            currentIndex: 0,
+            diff: -1
         }
     },
     computed: {
@@ -48,6 +58,12 @@ export default {
             return this.data.map(group => {
                 return group.title.substr(0, 1)
             })
+        },
+        fixedTitle() {
+            if (this.scrollY > 0) {
+                return ''
+            }
+            return this.data[this.currentIndex] ? this.data[this.currentIndex].title : ''
         }
     },
     watch: {
@@ -70,11 +86,20 @@ export default {
                 let height2 = listHeight[i + 1]
                 if (-newY >= height1 && -newY < height2) {
                     this.currentIndex = i
+                    this.diff = height2 + newY
                     return
                 }
             }
             // 当滚动到底部，且-newY 大于最后一个元素的上限
             this.currentIndex = listHeight.length - 2
+        },
+        diff(newVal) {
+            let fixedTop = (newVal > 0 && newVal < TITLE_HEIGHT) ? newVal - TITLE_HEIGHT : 0
+            if (this.fixedTop === fixedTop) {
+                return
+            }
+            this.fixedTop = fixedTop
+            this.$refs.fixed.style.transform = `translate3d(0,${fixedTop}px,0)`
         }
     },
     created() {
@@ -84,6 +109,9 @@ export default {
         this.listHeight = []
     },
     methods: {
+        selectItem(item) {
+            this.$emit('select', item)
+        },
         onShortcutTouchStart(e) {
             let anchorIndex = getData(e.target, 'index')
             let firstTouch = e.touches[0]
@@ -179,7 +207,7 @@ export default {
           color: $color-theme
     .list-fixed
       position: absolute
-      top: 0
+      top: -1px
       left: 0
       width: 100%
       .fixed-title
