@@ -176,6 +176,13 @@ export default {
             this.$nextTick(() => {
                 newState ? audio.play() : audio.pause()
             })
+        },
+        fullScreen(newVal) {
+            if (newVal) {
+                setTimeout(() => {
+                    this.$refs.lyricList.refresh()
+                }, 20)
+            }
         }
     },
     created() {
@@ -314,6 +321,9 @@ export default {
         },
         getLyric() {
             this.currentSong.getLyric().then(lyric => {
+                if (this.currentSong.lyric !== lyric) {
+                    return
+                }
                 this.currentLyric = new LyricParser(lyric, this.handleLyric)
                 if (this.playing) {
                     this.currentLyric.play()
@@ -336,6 +346,7 @@ export default {
         },
         middleTouchStart(e) {
             this.touch.initialed = true
+            this.touch.moved = false
             const touch = e.touches[0]
             this.touch.startX = touch.pageX
             this.touch.startY = touch.pageY
@@ -350,15 +361,21 @@ export default {
             if (Math.abs(deltaY) > Math.abs(deltaX)) {
                 return
             }
+            if (!this.touch.moved) {
+                this.touch.moved = true
+            }
             const left = this.currentShow === 'cd' ? 0 : -window.innerWidth
             const offsetWidth = Math.min(0, Math.max(-window.innerWidth, left + deltaX))
             this.touch.percent = Math.abs(offsetWidth / window.innerWidth)
             this.$refs.lyricList.$el.style.transform = `translate3d(${offsetWidth}px,0,0)`
-            this.$refs.lyricList.$el.style['transitionDuration'] = '0'
+            this.$refs.lyricList.$el.style['transitionDuration'] = 0
             this.$refs.middleL.style.opacity = 1 - this.touch.percent
-            this.$refs.middleL.style['transitionDuration'] = '0'
+            this.$refs.middleL.style['transitionDuration'] = 0
         },
         middleTouchEnd() {
+            if (!this.touch.moved) {
+                return
+            }
             let offsetWidth, opacity
             if (this.currentShow === 'cd') {
                 if (this.touch.percent > 0.1) {
@@ -381,8 +398,9 @@ export default {
             }
             this.$refs.lyricList.$el.style.transform = `translate3d(${offsetWidth}px,0,0)`
             this.$refs.lyricList.$el.style['transitionDuration'] = '300ms'
-            this.$refs.middleL.style.opacity = `${opacity}`
+            this.$refs.middleL.style.opacity = opacity
             this.$refs.middleL.style['transitionDuration'] = '300ms'
+            this.touch.initialed = false
         },
         showPlayList() {
             this.$refs.playList.show()
