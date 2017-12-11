@@ -39,7 +39,7 @@ export default {
     methods: {
         progressTouchStart(e) {
             this.touch.initialed = true
-            this.touch.startx = e.touches[0].pageX
+            this.touch.startX = e.touches[0].pageX
             this.touch.left = this.$refs.progress.clientWidth
         },
         progressTouchMove(e) {
