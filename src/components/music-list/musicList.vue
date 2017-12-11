@@ -16,7 +16,7 @@
         <div class="bg-layer" ref="layer"></div>
         <scroll :data="songs" :probe-type="probeType" :listen-scroll="listenScroll" class="list" @scroll="scroll" ref="list">
             <div class="song-list-wrapper">
-                <song-list :songs="songs" @select="selectItem"></song-list>
+                <song-list :rank="rank" :songs="songs" @select="selectItem"></song-list>
             </div>
             <div class="loading-container" v-show="!songs.length">
                 <loading></loading>
@@ -29,7 +29,10 @@ import scroll from '../../base/scroll/scroll'
 import songList from '../../base/songList/songList'
 import loading from '../../base/loading/loading'
 import { mapActions } from 'vuex'
+import { playListMixin } from '../../common/js/mixin'
+
 export default {
+    mixins: [playListMixin],
     props: {
         bgImage: {
             type: String,
@@ -42,6 +45,10 @@ export default {
         title: {
             type: String,
             default: ''
+        },
+        rank: {
+            type: Boolean,
+            default: false
         }
     },
     data() {
@@ -73,7 +80,8 @@ export default {
             } else {
                 blur = Math.min(20 * percent, 20)
             }
-            this.$refs.filter.style['backdrop-filter'] = `blur(${blur})px`
+            this.$refs.filter.style['webkitBackdrop-filter'] = `blur(${blur}px)`
+            this.$refs.filter.style['backdrop-filter'] = `blur(${blur}px)`
             if (newY < this.minTranslateY) {
                 zIndex = 10
                 this.$refs.playBtn.style.display = 'none'
@@ -114,6 +122,11 @@ export default {
             this.randomPlay({
                 list: this.songs
             })
+        },
+        handlePlaylist(playList) {
+            const bottom = playList.length > 0 ? '60px' : ''
+            this.$refs.list.$el.style.bottom = bottom
+            this.$refs.list.refresh()
         },
         ...mapActions([
             'selectPlay',

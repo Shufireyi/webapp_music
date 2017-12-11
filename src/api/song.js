@@ -11,9 +11,9 @@ export function getLyric(mid) {
     hostUin: 0,
     needNewCode: 0,
     categoryId: 10000000,
-    g_tk: 102338496,
     pcachetime: +new Date(),
     format: 'json'
+    // g_tk: 102338496,
   })
 
   return axios.get(url, {

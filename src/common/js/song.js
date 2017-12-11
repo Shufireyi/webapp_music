@@ -55,11 +55,11 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     img: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=46`
+    url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=99`
   })
 }
 
-function filterSinger(singer) {
+export function filterSinger(singer) {
   let ret = []
   singer.forEach(element => {
     ret.push(element.name)
