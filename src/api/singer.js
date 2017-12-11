@@ -38,33 +38,26 @@ export function getSingerDetail(singerId) {
 }
 
 // test
-// export function getQQSong(num, songmid) {
-//   num = 1512954968669
-//   songmid = '000YcSHE2q75dr'
-//   const url = `https://u.y.qq.com/cgi-bin/musicu.fcg?_=${num}`
-//   const data = Object.assign({}, {
-//     'comm': {
-//       'g_tk': 5381,
-//       'uin': 0,
-//       'format': 'json',
-//       'inCharset': 'utf-8',
-//       'outCharset': 'utf-8',
-//       'notice': 0,
-//       'platform': 'h5',
-//       'needNewCode': 1
-//     },
-//     'url_mid': {
-//       'module': 'vkey.GetVkeyServer',
-//       'method': 'CgiGetVkey',
-//       'param': {
-//         'guid': '4515150727',
-//         'songmid': [songmid],
-//         'songtype': [0],
-//         'uin': '0',
-//         'loginflag': 0,
-//         'platform': '23'
-//       }
-//     }
-//   })
-//   return jsonp(url, data, options)
-// }
+export function getQQSong(songmid) {
+  // songmid = '002l7DrZ3ucrF8'
+  const url = 'https://c.y.qq.com/base/fcgi-bin/fcg_music_express_mobile3.fcg'
+  const data = Object.assign({}, {
+    g_tk: 5381,
+    jsonpCallback: 'MusicJsonCallback6790135824072527',
+    loginUin: 0,
+    hostUin: 0,
+    format: 'json',
+    inCharset: 'utf8',
+    outCharset: 'utf-8',
+    notice: 0,
+    platform: 'yqq',
+    needNewCode: 0,
+    cid: 205361747,
+    callback: 'MusicJsonCallback6790135824072527',
+    uin: 0,
+    songmid: songmid,
+    filename: `C400${songmid}.m4a`,
+    guid: 4515150727
+  })
+  return jsonp(url, data)
+}

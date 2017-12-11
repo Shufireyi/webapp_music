@@ -93,7 +93,7 @@
             </div>
         </transition>
         <play-list ref="playList"></play-list>
-        <audio :src="currentSong.url" ref="audio" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
+        <audio :src="musicUrl" ref="audio" @play="ready" @error="error" @timeupdate="updateTime" @ended="end"></audio>
     </div>
 </template>
 
@@ -126,7 +126,8 @@ export default {
             currentLyric: null,
             currentLineNumber: 0,
             currentShow: 'cd',
-            playingLyric: ''
+            playingLyric: '',
+            musicUrl: ''
         }
     },
     computed: {
@@ -159,6 +160,9 @@ export default {
             if (newSong.id === oldSong.id) {
                 return
             }
+            newSong.url.then(res => {
+                this.musicUrl = res
+            })
             if (this.currentLyric) {
                 this.currentLyric.stop()
                 this.currentTime = 0
@@ -172,6 +176,9 @@ export default {
             }, 1000)
         },
         playing(newState) {
+            if (!this.musicUrl) {
+                return
+            }
             const audio = this.$refs.audio
             this.$nextTick(() => {
                 newState ? audio.play() : audio.pause()

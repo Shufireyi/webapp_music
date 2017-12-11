@@ -7,6 +7,9 @@ import {
 import {
   Base64
 } from 'js-base64'
+import {
+  getQQSong
+} from '../../api/singer'
 
 export default class Song {
   constructor({
@@ -55,7 +58,8 @@ export function createSong(musicData) {
     album: musicData.albumname,
     duration: musicData.interval,
     img: `https://y.gtimg.cn/music/photo_new/T002R300x300M000${musicData.albummid}.jpg?max_age=2592000`,
-    url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=99`
+    // url: `http://ws.stream.qqmusic.qq.com/${musicData.songid}.m4a?fromtag=99`
+    url: _getQQSong(musicData.songmid)
   })
 }
 
@@ -65,4 +69,12 @@ export function filterSinger(singer) {
     ret.push(element.name)
   })
   return ret.join('/')
+}
+
+function _getQQSong(songmid) {
+  return getQQSong(songmid).then(res => {
+    if (res.code === ERR_OK) {
+      return `http://dl.stream.qqmusic.qq.com/C400${res.data.items[0].songmid}.m4a?vkey=${res.data.items[0].vkey}&guid=4515150727&uin=0&fromtag=66`
+    }
+  })
 }
